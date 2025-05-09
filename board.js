@@ -1,126 +1,8 @@
-let boardSize = 600;
+let boardSize = 570;
 let cornerSize;
 let sideWidth;
 let sideHeight;
 let innerTiles = [];
-
-let labels = [
-  "GO",
-  "Joburg",
-  "Chance",
-  "Cape Town",
-  "Industry\nTax",
-  "Planning\nPermission",
-  "Delhi",
-  "Chance",
-  "Madras",
-  "Bombay",
-  "JAIL",
-  "Perth",
-  "Auction",
-  "Sydney",
-  "Melbourne",
-  "Planning\nPermission",
-  "Shenzhen",
-  "Chance",
-  "Beijing",
-  "Shanghai",
-  "FREE\nPARKING",
-  "Kyoto",
-  "Chance",
-  "Osaka",
-  "Tokyo",
-  "Planning\nPermission",
-  "Munich",
-  "Berlin",
-  "Chance",
-  "Frankfurt",
-  "GO TO\nJAIL",
-  "Liverpool",
-  "Manchester",
-  "Auction",
-  "London",
-  "Planning\nPermission",
-  "Chance",
-  "San Francisco",
-  "Industry Tax",
-  "New York",
-];
-
-const propertyColors = {
-  "South Africa": {
-    names: ["Joburg", "Cape Town"],
-    color: "#D65F3E",
-  },
-  India: {
-    names: ["Delhi", "Madras", "Bombay"],
-    color: "#ADD8E6",
-  },
-  Australia: {
-    names: ["Perth", "Sydney", "Melbourne"],
-    color: "#EA2BFF",
-  },
-  China: {
-    names: ["Shenzhen", "Beijing", "Shanghai"],
-    color: "#FFA01C",
-  },
-  Japan: {
-    names: ["Kyoto", "Osaka", "Tokyo"],
-    color: "#FF1500",
-  },
-  Germany: {
-    names: ["Munich", "Berlin", "Frankfurt"],
-    color: "#ECF016",
-  },
-  UK: {
-    names: ["Liverpool", "Manchester", "London"],
-    color: "#17AD30",
-  },
-  USA: {
-    names: ["San Francisco", "New York"],
-    color: "#516CF0",
-  },
-  Chance: {
-    names: ["Chance"],
-    color: "#FFE682",
-  },
-  "Planning Permission": {
-    names: ["Planning\nPermission"],
-    color: "#64A2D1",
-  },
-};
-
-const specialTileColors = {
-  Chance: "#FFE682",
-  "Industry\nTax": "#D3D3D3",
-  Auction: "#D3D3D3",
-  "Planning\nPermission": "#64A2D1",
-};
-
-const propertyPrices = {
-  Joburg: 0.6,
-  "Cape Town": 0.6,
-  Delhi: 1,
-  Madras: 1,
-  Bombay: 1.2,
-  Perth: 1.4,
-  Sydney: 1.4,
-  Melbourne: 1.6,
-  Shenzhen: 1.8,
-  Beijing: 1.8,
-  Shanghai: 2,
-  Kyoto: 2.2,
-  Osaka: 2.2,
-  Tokyo: 2.4,
-  Munich: 2.6,
-  Berlin: 2.8,
-  Frankfurt: 2.8,
-  Liverpool: 3,
-  Manchester: 3,
-  London: 3.2,
-  "San Francisco": 3.5,
-  "New York": 4,
-};
 
 // Filter only property tiles
 let propertyLabels = labels.filter(
@@ -133,10 +15,6 @@ let propertyLabels = labels.filter(
     !l.includes("Planning") &&
     !l.includes("Auction")
 );
-
-function preload() {
-  font = loadFont("PoiretOne-Regular.ttf");
-}
 
 function drawBoard() {
   stroke(0);
@@ -201,7 +79,7 @@ function drawCorner(x, y, label) {
 
 function drawLabel(x, y, w, h, label) {
   let isProperty = propertyLabels.includes(label);
-  let fillColor = "#DCDCDC"; // default colour
+  let fillColor = "rgb(220, 220, 220)"; // default colour
 
   if (isProperty) {
     fillColor = getPropertyColor(label);
@@ -317,6 +195,7 @@ function drawPropertyTiles() {
       console.log(`Drawing hazard on ${label} at (${x}, ${y})`);
     }
   }
+  drawBuildings();
 }
 
 function drawChanceCard() {
@@ -364,6 +243,40 @@ function drawGameBoard() {
     if (hazards[property.name]) {
       console.log(`Drawing hazard at (${property.x}, ${property.y})`);
       drawCircle(property.x, property.y, "black");
+    }
+  }
+}
+
+function drawBuildings() {
+  for (let property in propertyBuildings) {
+    if (!propertyOwners.hasOwnProperty(property)) continue;
+
+    let buildings = propertyBuildings[property];
+    let totalBuildings = buildings.residential + buildings.industrial;
+    if (totalBuildings === 0) continue;
+
+    let propertyIndex = labels.indexOf(property);
+    if (propertyIndex === -1) continue;
+
+    let [x, y] = getTilePosition(propertyIndex);
+    let hazardPresent = hazards[property] === true; // Check if this property has a hazard
+
+    // Draw residential buildings (grey or faded if hazard present)
+    for (let i = 0; i < buildings.residential; i++) {
+      if (hazards[property]) {
+        fill(200, 200, 200, 120); // faded grey if hazard is present
+      } else {
+        fill(150); // normal grey
+      }
+      stroke(0);
+      rect(x - 15 + i * 4, y + 10, 3, 3);
+    }
+
+    // Draw industrial buildings (light blue - not affected by hazards)
+    for (let i = 0; i < buildings.industrial; i++) {
+      fill(100, 180, 255); // Light blue
+      stroke(0);
+      rect(x - 15 + i * 4, y + 16, 3, 3);
     }
   }
 }
