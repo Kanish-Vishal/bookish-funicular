@@ -106,7 +106,7 @@ let labels = [
   "Chance",
   "Cape Town",
   "Industry\nTax",
-  "Planning\nPermission",
+  "Lottery",
   "Delhi",
   "Chance",
   "Madras",
@@ -116,7 +116,7 @@ let labels = [
   "Auction",
   "Sydney",
   "Melbourne",
-  "Planning\nPermission",
+  "Lottery",
   "Shenzhen",
   "Chance",
   "Beijing",
@@ -126,7 +126,7 @@ let labels = [
   "Chance",
   "Osaka",
   "Tokyo",
-  "Planning\nPermission",
+  "Lottery",
   "Munich",
   "Berlin",
   "Chance",
@@ -136,7 +136,7 @@ let labels = [
   "Manchester",
   "Auction",
   "London",
-  "Planning\nPermission",
+  "Lottery",
   "Chance",
   "San Francisco",
   "Industry Tax",
@@ -180,10 +180,6 @@ const propertyColors = {
     names: ["Chance"],
     color: "rgb(255, 230, 130)",
   },
-  "Planning Permission": {
-    names: ["Planning\nPermission"],
-    color: "rgb(100, 162, 209)",
-  },
 };
 
 
@@ -191,7 +187,7 @@ const specialTileColors = {
   Chance: "#FFE682",
   "Industry\nTax": "#D3D3D3",
   Auction: "#D3D3D3",
-  "Planning\nPermission": "#64A2D1",
+  "Lottery": "#64A2D1",
 };
 
 const propertyPrices = {
