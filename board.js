@@ -12,7 +12,7 @@ let propertyLabels = labels.filter(
     !l.includes("FREE") &&
     !l.includes("Chance") &&
     !l.includes("Tax") &&
-    !l.includes("Planning") &&
+    !l.includes("Lottery") &&
     !l.includes("Auction")
 );
 
@@ -125,77 +125,7 @@ function getCornerColor(label) {
   if (label.includes("GO") && !label.includes("JAIL")) return "#1DC4A3"; // Turqoise
   if (label.includes("JAIL")) return "#F5C962"; // Orange
   if (label.includes("FREE")) return "#1DC4A3"; // Turqoise
-}
-
-function drawPropertyTiles() {
-  const innerX = cornerSize;
-  const innerY = cornerSize;
-  const innerW = boardSize - 2 * cornerSize;
-  const innerH = boardSize - 2 * cornerSize;
-
-  const cols = 5;
-  const rows = 5;
-  const total = 22;
-  const tileW = innerW / cols;
-  const tileH = innerH / rows;
-
-  let count = 0;
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (count >= total) return;
-      if ((r === 2 && c === 2) || (r === 0 && c === 0) || (r === 4 && c === 4))
-        continue;
-
-      let x = innerX + c * tileW;
-      let y = innerY + r * tileH;
-      let label = propertyLabels[count];
-      let fillColor = getPropertyColor(label);
-
-      fill(fillColor);
-      stroke(0);
-      rect(x, y, tileW, tileH);
-
-      fill(0);
-      text(label, x + tileW / 2, y + tileH / 2);
-
-      count++;
-    }
-  }
-
-  // Draw player tokens
-  for (let i = 0; i < players.length; i++) {
-    let player = players[i];
-    let [x, y] = getTilePosition(player.pos);
-
-    fill(player.color);
-    stroke(0);
-    strokeWeight(1.5);
-    ellipse(x + i * 8 - 12, y, 20); // Spread out tokens
-  }
-
-  // Draw bonuses and hazards on owned properties
-  for (let label of propertyLabels) {
-    let idx = labels.indexOf(label);
-    if (idx === -1) continue;
-
-    let [x, y] = getTilePosition(idx);
-
-    if (bonusBuildings[label]) {
-      fill("pink");
-      noStroke();
-      ellipse(x - 10, y - 10, 12); // Small pink circle in the tile
-      console.log(`Drawing bonus building on ${label} at (${x}, ${y})`);
-    }
-
-    if (hazards[label]) {
-      fill("black");
-      noStroke();
-      ellipse(x - 10, y - 10, 12); // Small black circle in the tile
-      console.log(`Drawing hazard on ${label} at (${x}, ${y})`);
-    }
-  }
-  drawBuildings();
+  return "#D3D3D3"; // Default gray for other corners
 }
 
 function drawChanceCard() {
@@ -231,52 +161,42 @@ function getPropertyColor(name) {
   return "#DDDDDD";
 }
 
-function drawGameBoard() {
-  for (let property of propertyLabels) {
-    drawPropertyTiles(property);
+function drawTokens() {
+  for (let i = 0; i < players.length; i++) {
+    let player = players[i];
+    let [x, y] = getTilePosition(player.pos);
 
-    if (bonusBuildings[property.name]) {
-      console.log(`Drawing bonus building at (${property.x}, ${property.y})`);
-      drawCircle(property.x, property.y, "pink");
-    }
-
-    if (hazards[property.name]) {
-      console.log(`Drawing hazard at (${property.x}, ${property.y})`);
-      drawCircle(property.x, property.y, "black");
-    }
+    fill(player.color);
+    stroke(0);
+    strokeWeight(1.5);
+    ellipse(x + i * 8 - 12, y, 20);
   }
 }
 
-function drawBuildings() {
-  for (let property in propertyBuildings) {
-    if (!propertyOwners.hasOwnProperty(property)) continue;
-
-    let buildings = propertyBuildings[property];
-    let totalBuildings = buildings.residential + buildings.industrial;
-    if (totalBuildings === 0) continue;
-
-    let propertyIndex = labels.indexOf(property);
-    if (propertyIndex === -1) continue;
-
-    let [x, y] = getTilePosition(propertyIndex);
-    let hazardPresent = hazards[property] === true; // Check if this property has a hazard
-
-    // Draw residential buildings (grey or faded if hazard present)
-    for (let i = 0; i < buildings.residential; i++) {
-      if (hazards[property]) {
-        fill(200, 200, 200, 120); // faded grey if hazard is present
-      } else {
-        fill(150); // normal grey
-      }
-      stroke(0);
-      rect(x - 15 + i * 4, y + 10, 3, 3);
-    }
-
-    // Draw industrial buildings (light blue - not affected by hazards)
-    for (let i = 0; i < buildings.industrial; i++) {
-      fill(100, 180, 255); // Light blue
-      stroke(0);
-      rect(x - 15 + i * 4, y + 16, 3, 3);
-    }
+function getTilePosition(idx) {
+  if (idx == 0) return [boardSize - cornerSize / 2, boardSize - cornerSize / 2];
+  if (idx < 10) {
+    let x = boardSize - cornerSize - idx * sideHeight + sideHeight / 2;
+    let y = boardSize - cornerSize / 2;
+    return [x, y];
   }
+  if (idx == 10) return [cornerSize / 2, boardSize - cornerSize / 2];
+  if (idx < 20) {
+    let x = cornerSize / 2;
+    let y = boardSize - cornerSize - (idx - 10) * sideHeight + sideHeight / 2;
+    return [x, y];
+  }
+  if (idx == 20) return [cornerSize / 2, cornerSize / 2];
+  if (idx < 30) {
+    let x = cornerSize + (idx - 21) * sideHeight + sideHeight / 2;
+    let y = cornerSize / 2;
+    return [x, y];
+  }
+  if (idx == 30) return [boardSize - cornerSize / 2, cornerSize / 2];
+  if (idx < 40) {
+    let x = boardSize - cornerSize / 2;
+    let y = cornerSize + (idx - 31) * sideHeight + sideHeight / 2;
+    return [x, y];
+  }
+  print(idx);
 }
